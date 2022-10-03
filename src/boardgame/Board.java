@@ -6,31 +6,64 @@ public class Board {
 	private Piece[][] pieces;
 	
 	public Board(int rows, int columns) {
+		if (rows < 1 || columns < 1)
+			throw new BoardEsception("Erro ao criar o tabuleiro: Necessário informar ao menos uma coluna e uma linha.");
 		this.rows = rows;
 		this.columns = columns;
 		this.pieces = new Piece[rows][columns];
 	}
 
-	protected int getRows() {
+	public int getRows() {
 		return rows;
 	}
 
-	protected void setRows(int rows) {
-		this.rows = rows;
-	}
-
-	protected int getColumns() {
+	public int getColumns() {
 		return columns;
-	}
-
-	protected void setColumns(int columns) {
-		this.columns = columns;
 	}
 	
 	public Piece piece(int row, int column) {
+		if (!this.positionExists(row, column)) 
+			throw new BoardEsception("A posição informada é inválida.");
 		return this.pieces[row][column];
 	}
+	
 	public Piece piece(Position position) {
+		if (!this.positionExists(position)) 
+			throw new BoardEsception("A posição informada é inválida.");
 		return this.pieces[position.getRow()][position.getColumn()];
+	}
+	
+	public void placePiece(Piece piece, Position position) {
+		if (this.thereIsAPiece(position))
+			throw new BoardEsception("Já existe uma peça na posição " + position);
+		this.pieces[position.getRow()][position.getColumn()] = piece;
+		piece.position = position;
+	}
+	
+	public Piece removePiece(Position position) {
+		if (!this.positionExists(position))
+			throw new BoardEsception("A posição informada é inválida.");
+		
+		if (this.piece(position) == null)
+			return null;
+		
+		Piece aux = this.piece(position);
+		aux.position = null;
+		this.pieces[position.getRow()][position.getColumn()] = null;
+		return aux;
+	}
+	
+	private boolean positionExists(int row, int column) {
+		return row >= 0 && row < this.rows && column >= 0 && column < this.columns;
+	}
+	
+	public boolean positionExists(Position position) {
+		return this.positionExists(position.getRow(), position.getColumn());
+	}
+	
+	public boolean thereIsAPiece(Position position) {
+		if (!this.positionExists(position)) 
+			throw new BoardEsception("A posição informada é inválida.");
+		return this.piece(position) != null;
 	}
 }
